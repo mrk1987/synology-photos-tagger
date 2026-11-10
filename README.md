@@ -65,6 +65,14 @@ spt first-run --limit 200 --no-write   # try on 200 photos, inspect
 spt first-run
 ```
 
+## TODO
+
+- **Video tagging.** Include videos (`unit.type = 1`): sample 5-10 frames per video with
+  `ffmpeg` keyframe seeks, run the tag model on each and merge the tags. Estimated 2-4 s per
+  video on a GTX 1650 (not measured). Start with tags only. Open questions: whether Synology
+  Photos shows and searches tags on videos like on photos (test on one video first), and how
+  the app handles a `face` row that points at a video.
+
 ## Credits
 
 - Inspired by [eleonne/synology-tagger](https://github.com/eleonne/synology-tagger)
