@@ -7,8 +7,9 @@ Better people and tags for **Synology Photos**, computed on your own GPU instead
   Names you already gave in Synology are carried over automatically.
 - **Tags**: every photo gets up to 15 tags from RAM++ (Recognize Anything, 4,585 tags:
   objects, scenes, events, activities), searchable in Synology Photos and listed under Tags.
-- **NAS stays idle**: the heavy work runs on a PC, VM or container with an NVIDIA GPU
-  (a 4 GB GTX 1650 is enough: about 0.4 s per photo).
+- **NAS stays idle**: the heavy work runs on another PC, VM or container. An NVIDIA GPU is
+  recommended (a 4 GB GTX 1650 is enough: about 0.4 s per photo) but not required: without one
+  everything falls back to the CPU, only slower. See "No GPU?" in [docs/SETUP.md](docs/SETUP.md).
 - **Reversible**: every row it writes is recorded in a separate `tagger` schema;
   `spt undo` removes exactly those rows. Synology's own people are hidden, never deleted.
 

@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import time
+from pathlib import Path
 
 from . import config, pipeline, store, syno
 
@@ -63,7 +65,13 @@ def main(argv: list[str] | None = None) -> None:
         db = store.connect(cfg.data_dir)
         if a.cmd == "first-run":
             pipeline.scan(cfg, db, pg, uid, workers=a.workers, limit=a.limit)
-            pipeline.cluster(cfg, db, pg, uid)
+            if syno.people_written(pg):
+                # Regrouping renumbers the groups, and the people already in Synology are tied
+                # to the old numbers: faces would land on the wrong person.
+                pipeline.log("people are already written: not regrouping, finishing the write. "
+                             "To regroup from scratch run `spt undo` first; new photos are handled by `spt nightly`.")
+            else:
+                pipeline.cluster(cfg, db, pg, uid)
             if a.no_write:
                 print("not written (--no-write). Run `spt first-run` again without it to write.")
                 return
@@ -77,9 +85,13 @@ def main(argv: list[str] | None = None) -> None:
             pipeline.log(f"new people: {pipeline.new_people(cfg, db)}")
             pipeline.write(cfg, db, pg, uid)
             # For monitoring: age of this file = time since the last successful run.
-            status = cfg.data_dir.parent / "status"
-            status.mkdir(exist_ok=True)
-            (status / "last_success.json").write_text(json.dumps({"time": int(time.time()), "photos": len(done)}))
+            # SPT_STATUS_DIR: put it somewhere your monitoring can read (the data dir is mode 700).
+            status = Path(os.environ.get("SPT_STATUS_DIR") or cfg.data_dir / "status")
+            try:
+                status.mkdir(parents=True, exist_ok=True)
+                (status / "last_success.json").write_text(json.dumps({"time": int(time.time()), "photos": len(done)}))
+            except OSError as exc:
+                pipeline.log(f"could not write status file in {status}: {exc}")
 
 
 if __name__ == "__main__":

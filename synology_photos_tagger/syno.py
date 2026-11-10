@@ -80,6 +80,13 @@ def ledger_exists(pg: psycopg.Connection) -> bool:
     return pg.execute("SELECT to_regclass('tagger.face') IS NOT NULL").fetchone()[0]
 
 
+def people_written(pg: psycopg.Connection) -> bool:
+    """True once this tool has created people in Synology Photos."""
+    if not pg.execute("SELECT to_regclass('tagger.person') IS NOT NULL").fetchone()[0]:
+        return False
+    return pg.execute("SELECT EXISTS (SELECT 1 FROM tagger.person)").fetchone()[0]
+
+
 def people_flags(pg: psycopg.Connection, uid: int, on: bool) -> None:
     """The People album needs both the global and the per-user enable_person flag."""
     v = "true" if on else "false"

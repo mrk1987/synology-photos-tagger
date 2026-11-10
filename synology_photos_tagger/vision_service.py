@@ -108,7 +108,7 @@ app = FastAPI(title="synology-photos-tagger vision")
 
 @app.on_event("startup")
 def startup() -> None:
-    fa = FaceAnalysis(name="antelopev2", root=str(CFG.model_dir / "insightface"),
+    fa = FaceAnalysis(name=os.environ.get("SPT_FACE_MODEL") or "antelopev2", root=str(CFG.model_dir / "insightface"),
                       allowed_modules=["detection", "recognition"], providers=PROVIDERS)
     fa.prepare(ctx_id=0, det_size=(640, 640), det_thresh=0.5)
     ram_dir = CFG.model_dir / "ram-plus"

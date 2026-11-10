@@ -111,6 +111,9 @@ def cluster(cfg: Config, db, pg, uid: int, min_size: int = 3) -> None:
 
     rows = db.execute("SELECT id, id_unit, x1, y1, x2, y2, score, embedding FROM faces").fetchall()
     elig = [r for r in rows if _eligible(cfg, r[6], r[4] - r[2])]
+    if len(elig) < 2:
+        log(f"faces {len(rows)}, eligible {len(elig)}: too few to group into people")
+        return
     E = np.stack([np.frombuffer(r[7], dtype="<f4") for r in elig]).astype(np.float64)
     raw = fcluster(linkage(E, method="average", metric="cosine"), t=cfg.cluster_dist, criterion="distance")
     size = Counter(raw.tolist())

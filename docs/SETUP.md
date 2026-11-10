@@ -45,6 +45,16 @@ sh scripts/download_models.sh /opt/synology-photos-tagger/models
 This fetches RAM++ ONNX (Apache-2.0, ~1.8 GB) and InsightFace antelopev2 (**non-commercial
 research licence**, ~350 MB).
 
+**No GPU?** The vision service uses ONNX Runtime, which falls back to the CPU when CUDA is not
+available, so the same install works without a GPU. Expect seconds per photo instead of 0.4 s:
+the tag model alone measured 2-8 s per photo on CPU. That is fine for nightly runs; a first run
+over a large library takes days, and can be stopped and resumed. To make faces lighter on CPU,
+set `SPT_FACE_MODEL=buffalo_s` (InsightFace's small pack, same non-commercial licence,
+downloaded automatically on first start). This is **untested**: it is less accurate than
+antelopev2, and `SPT_CLUSTER_DIST` / `SPT_ATTACH` were tuned for antelopev2, so check the
+summary of `spt first-run --no-write` before writing. Pick the pack before the first run;
+embeddings from different packs cannot be mixed.
+
 ## 2. Database access (NAS)
 
 The tool needs a PostgreSQL role on `synofoto`. Postgres on DSM only listens on 127.0.0.1, so
