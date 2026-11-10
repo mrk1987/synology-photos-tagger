@@ -113,7 +113,8 @@ def startup() -> None:
     fa.prepare(ctx_id=0, det_size=(640, 640), det_thresh=0.5)
     ram_dir = CFG.model_dir / "ram-plus"
     state["faces"] = fa
-    state["ram"] = ort.InferenceSession(str(ram_dir / "ram_plus.onnx"), providers=PROVIDERS)
+    tag_providers = ["CPUExecutionProvider"] if os.environ.get("SPT_TAGS_DEVICE", "gpu") == "cpu" else PROVIDERS
+    state["ram"] = ort.InferenceSession(str(ram_dir / "ram_plus.onnx"), providers=tag_providers)
     state["tags"] = (ram_dir / "ram_tag_list.txt").read_text(encoding="utf-8").splitlines()
     state["thresholds"] = np.array([float(x) for x in (ram_dir / "ram_tag_list_threshold.txt")
                                     .read_text().split()], dtype=np.float32)
