@@ -30,7 +30,7 @@ Better people and tags for **Synology Photos**, computed on your own GPU instead
 
 | | Synology's built-in | synology-photos-tagger |
 |---|---|---|
-| People | 2,477 groups, mostly 1-3 photos each | 348 people, 2,000+ named faces with 0 mix-ups |
+| People | 2,477 groups, mostly 1-3 photos each | 348 people; of the 2,000+ faces already named in Synology, none ended up mixed with another name (checked against my own labels, not an accuracy test) |
 | Tags | object recognition off (poor quality) | 2,977 distinct tags, 201k links |
 | NAS CPU | constant during indexing | one face scan per upload |
 | First run | - | ~50 min on an RTX 5090, a few hours on a GTX 1650 |
