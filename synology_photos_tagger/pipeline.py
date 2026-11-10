@@ -171,6 +171,30 @@ def assign(cfg: Config, db, unit_ids: list[int]) -> int:
     return n
 
 
+def new_people(cfg: Config, db, min_photos: int = 3) -> int:
+    """Group faces that matched nobody (cluster -1, whole library). A group seen on at least
+    `min_photos` different photos becomes a new, unnamed person. Returns how many."""
+    from scipy.cluster.hierarchy import fcluster, linkage
+
+    pool = db.execute("SELECT id, id_unit, embedding FROM faces WHERE cluster = -1").fetchall()
+    if len(pool) < min_photos:
+        return 0
+    P = np.stack([np.frombuffer(r[2], dtype="<f4") for r in pool]).astype(np.float64)
+    lab = fcluster(linkage(P, method="average", metric="cosine"), t=cfg.cluster_dist, criterion="distance")
+    groups: dict[int, list[tuple[int, int]]] = defaultdict(list)
+    for (fid, unit, _), g in zip(pool, lab.tolist()):
+        groups[g].append((fid, unit))
+    next_id = (db.execute("SELECT max(cluster) FROM faces").fetchone()[0] or 0) + 1
+    made = 0
+    for members in groups.values():
+        if len({u for _, u in members}) >= min_photos:
+            db.executemany("UPDATE faces SET cluster=? WHERE id=?", [(next_id, f) for f, _ in members])
+            next_id += 1
+            made += 1
+    db.commit()
+    return made
+
+
 # ---------------------------------------------------------------- write
 def _crop(cfg: Config, folder: str, fname: str, box) -> bytes | None:
     p = image_path(cfg, folder, fname)

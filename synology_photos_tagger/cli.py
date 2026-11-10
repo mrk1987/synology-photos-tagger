@@ -10,7 +10,9 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+import time
 
 from . import config, pipeline, store, syno
 
@@ -72,7 +74,12 @@ def main(argv: list[str] | None = None) -> None:
             done = pipeline.scan(cfg, db, pg, uid, workers=a.workers)
             n = pipeline.assign(cfg, db, done)
             pipeline.log(f"faces attached to known people: {n}")
+            pipeline.log(f"new people: {pipeline.new_people(cfg, db)}")
             pipeline.write(cfg, db, pg, uid)
+            # For monitoring: age of this file = time since the last successful run.
+            status = cfg.data_dir.parent / "status"
+            status.mkdir(exist_ok=True)
+            (status / "last_success.json").write_text(json.dumps({"time": int(time.time()), "photos": len(done)}))
 
 
 if __name__ == "__main__":
