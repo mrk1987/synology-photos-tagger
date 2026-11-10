@@ -1,0 +1,14 @@
+[Unit]
+Description=synology-photos-tagger SSH tunnel to the NAS database
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=tagger
+# Edit admin-user@nas. The key must be restricted on the NAS (see docs/SETUP.md).
+ExecStart=/usr/bin/ssh -N -o BatchMode=yes -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 127.0.0.1:15432:127.0.0.1:5432 admin-user@nas
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

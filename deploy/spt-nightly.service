@@ -1,0 +1,12 @@
+[Unit]
+Description=synology-photos-tagger nightly run (new uploads)
+Wants=spt-vision.service spt-tunnel.service
+After=spt-vision.service spt-tunnel.service
+
+[Service]
+Type=oneshot
+User=tagger
+WorkingDirectory=/opt/synology-photos-tagger
+EnvironmentFile=/opt/synology-photos-tagger/.env
+ExecStart=/opt/synology-photos-tagger/.venv/bin/spt nightly
+TimeoutStartSec=6h

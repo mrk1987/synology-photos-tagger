@@ -1,0 +1,16 @@
+synology-photos-tagger
+Copyright 2026 mrk1987 and contributors
+
+This project was inspired by synology-tagger by eleonne
+(https://github.com/eleonne/synology-tagger), licensed under the Apache License 2.0.
+synology-tagger first demonstrated writing tags into Synology Photos' general_tag tables.
+No source code from synology-tagger is included in this project.
+
+Third-party models used at runtime (downloaded separately, not distributed here):
+- InsightFace antelopev2 (SCRFD-10GF, ArcFace ResNet100 @ Glint360K) - non-commercial research
+  licence, https://github.com/deepinsight/insightface
+- RAM++ (Recognize Anything Plus), Apache License 2.0,
+  https://github.com/xinyu1205/recognize-anything
+
+Synology and Synology Photos are trademarks of Synology Inc. This project is not affiliated
+with or endorsed by Synology Inc.

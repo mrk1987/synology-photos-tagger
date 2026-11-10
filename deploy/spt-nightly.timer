@@ -1,0 +1,9 @@
+[Unit]
+Description=Run synology-photos-tagger every night
+
+[Timer]
+OnCalendar=*-*-* 03:30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

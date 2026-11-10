@@ -1,0 +1,12 @@
+.env
+*.env
+!.env.example
+data/
+models/
+*.sqlite
+*.dump
+__pycache__/
+*.egg-info/
+.venv/
+build/
+dist/

@@ -1,0 +1,14 @@
+[Unit]
+Description=synology-photos-tagger vision service (faces + tags on GPU)
+After=network-online.target
+
+[Service]
+User=tagger
+WorkingDirectory=/opt/synology-photos-tagger
+EnvironmentFile=/opt/synology-photos-tagger/.env
+ExecStart=/opt/synology-photos-tagger/.venv/bin/spt serve
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
