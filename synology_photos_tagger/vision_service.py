@@ -70,7 +70,15 @@ def run_tags(img: Image.Image) -> list[dict]:
     if CFG.low_vram:
         opts.add_run_config_entry("memory.enable_memory_arena_shrinkage", "gpu:0")
     with tag_lock:
-        s = state["ram"].run(["output"], {"input": x}, opts)[0][0]
+        try:
+            s = state["ram"].run(["output"], {"input": x}, opts)[0][0]
+        except Exception as exc:  # noqa: BLE001 - typically GPU out of memory on 4 GB cards
+            if "CUDAExecutionProvider" not in state["ram"].get_providers():
+                raise
+            log.warning("RAM++ failed on GPU (%s); switching tags to CPU", str(exc)[:120])
+            state["ram"] = ort.InferenceSession(str(CFG.model_dir / "ram-plus" / "ram_plus.onnx"),
+                                                providers=["CPUExecutionProvider"])
+            s = state["ram"].run(["output"], {"input": x})[0][0]
     if s.min() < 0 or s.max() > 1:
         s = 1.0 / (1.0 + np.exp(-s))
     idx = np.nonzero(s >= state["thresholds"])[0]

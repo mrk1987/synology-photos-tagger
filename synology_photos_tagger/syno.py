@@ -45,7 +45,12 @@ UPDATE person p SET hidden = h.prev_hidden FROM tagger.hidden_person h WHERE p.i
 
 
 def connect(cfg: Config) -> psycopg.Connection:
-    return psycopg.connect(cfg.pg_dsn, password=cfg.pg_password or None, connect_timeout=15)
+    # search_path=public: if the role is named like the ledger schema (`tagger`), Postgres'
+    # default "$user", public would resolve `face` to tagger.face.
+    # autocommit: each `with pg.transaction()` is then a real transaction, not a savepoint
+    # inside an implicit one that is rolled back on exit.
+    return psycopg.connect(cfg.pg_dsn, password=cfg.pg_password or None, connect_timeout=15,
+                           options="-c search_path=public", autocommit=True)
 
 
 def user_id(pg: psycopg.Connection, name: str) -> int:
